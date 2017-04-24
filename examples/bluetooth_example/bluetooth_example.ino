@@ -1,9 +1,9 @@
 #define ROBOT_NAME "RandomBot"
 
 // If you haven't configured your device before use this
-//#define BLUETOOTH_SPEED 9600
+#define BLUETOOTH_SPEED 9600
 // If you are modifying your existing configuration, use this:
-#define BLUETOOTH_SPEED 57600
+//#define BLUETOOTH_SPEED 57600
 
 #include <SoftwareSerial.h>
 
