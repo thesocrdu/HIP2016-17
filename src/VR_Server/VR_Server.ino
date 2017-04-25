@@ -2,7 +2,7 @@
  * @author <Your name here>
  *
  * This sketch controls various electrical
- * electrical products using your voice.
+ * products using your voice.
  * There is a bluetooth interface so that
  * one may see the status of powered devices.
  */
@@ -27,6 +27,11 @@
 
 EasyVR easyvr(port);
 
+// Constant pin numbers
+const int LED_PIN1 = 22;
+const int LED_PIN2 = 23;
+const int RELAY_PIN1 = 24;
+
 //Groups and Commands
 enum Groups
 {
@@ -41,23 +46,30 @@ enum Group0
 
 enum Group1 
 {
-  G1_REDLED = 0,
-  G1_GREENLED = 1,
-  G1_RELAY = 2,
+  G1_SAYHI = 0,
+  G1_TURNON = 1,
+  G1_TURNOFF = 2,
+  G1_TURNON_KYLE = 6,
+  G1_POWEROFF_KYLE = 7,
+  G1_SAYHI_KYLE = 8,
 };
 
 
 int8_t group, idx;
+boolean relayState = 0;
 
 // The setup function runs only once
 void setup()
 {
-  pinMode (8, OUTPUT);
-  pinMode (9, OUTPUT);
-  pinMode (4, OUTPUT);
+  pinMode (LED_PIN1, OUTPUT);
+  pinMode (LED_PIN2, OUTPUT);
+  pinMode (RELAY_PIN1, OUTPUT);
   
   // setup PC serial port
   pcSerial.begin(9600);
+
+  // Start bluetooth
+  arduinoBtSetup();
 
   // bridge mode?
   int mode = easyvr.bridgeRequested(pcSerial);
@@ -164,40 +176,81 @@ void loop()
       Serial.println(err, HEX);
     }
   }
+
+  // Update and send bluetooth status
+  sendBlutoothValues();
 }
 
+/**
+ * Action function for reacting to
+ * various trained voice commands.
+ */
 void action()
 {
+  Serial.println("Debug 3");
     switch (group)
     {
     case GROUP_0:
       switch (idx)
       {
       case G0_MY_SD_TRIGGER:
-        // write your action code here
+        Serial.println("I heard my name!");
         group = GROUP_1; // <-- jump to group 1
         break;
       }
       break;
+
     case GROUP_1:
-      switch (idx)
-      {
-      case G1_REDLED:
-        // write your action code here
-        digitalWrite(9, HIGH);
-        // group = GROUP_X; <-- or jump to another group X for composite commands
-        break;
-      case G1_GREENLED:
-        // write your action code here
-        digitalWrite(8, HIGH);
-        // group = GROUP_X; <-- or jump to another group X for composite commands
-        break;
-      case G1_RELAY:
-        // write your action code here
-        digitalWrite(4, HIGH);
-        // group = GROUP_X; <-- or jump to another group X for composite commands
-        break;
+      if (idx == G1_SAYHI_KYLE) {
+        Serial.println("Hi there!");
+        digitalWrite(LED_PIN1, HIGH);
+        delay(500);
+        digitalWrite(LED_PIN1, LOW);
+      } else if (idx == G1_TURNON_KYLE) {
+        Serial.println("Turning on...");
+        digitalWrite(RELAY_PIN1, HIGH);
+        relayState = HIGH;
+      } else if (idx == G1_POWEROFF_KYLE) {
+        Serial.println("Powering off...");
+        digitalWrite(RELAY_PIN1, LOW);
+        relayState = LOW;
       }
       break;
     }
+}
+
+/**
+ * Setup the bluetooth module.
+ */
+void arduinoBtSetup() {
+  // THIS BAUD RATE HAS PROBLEMS TRANSMITTING
+  // The Bluetooth Mate defaults to 115200bps
+  Serial1.begin(115200);
+  delay(10);
+
+  // Put module into CMD mode
+  Serial1.write("$$$");
+  // Give some time for BT to send back CMD
+  delay(100);
+
+  // Set baud to a lower rate of 9600
+  Serial1.write("SU,9600\r");
+  delay(100);
+
+  // Clear the BT buffer of junk
+  while (Serial1.available()) {
+    Serial1.read();
+  }
+
+  // Set new baud for Arduino
+  Serial1.begin(9600);
+}
+
+/**
+ * Send updated relay values over
+ * Bluetooth interface.
+ */
+void sendBlutoothValues() {
+  Serial1.write("Relay State: ");
+  Serial1.write(relayState > 0 ? "ON\n" : "OFF\n");
 }
