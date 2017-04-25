@@ -178,7 +178,8 @@ void loop()
   }
 
   // Update and send bluetooth status
-  sendBlutoothValues();
+  // TODO: HINT there's a function written
+  //       below that will do this for you!
 }
 
 /**
@@ -187,7 +188,6 @@ void loop()
  */
 void action()
 {
-  Serial.println("Debug 3");
     switch (group)
     {
     case GROUP_0:
@@ -202,18 +202,14 @@ void action()
 
     case GROUP_1:
       if (idx == G1_SAYHI_KYLE) {
-        Serial.println("Hi there!");
-        digitalWrite(LED_PIN1, HIGH);
-        delay(500);
-        digitalWrite(LED_PIN1, LOW);
+        // Say hi on the serial console
+        // and blink LED_PIN1 once.
       } else if (idx == G1_TURNON_KYLE) {
-        Serial.println("Turning on...");
-        digitalWrite(RELAY_PIN1, HIGH);
-        relayState = HIGH;
+        // Print "Turning on..." out to the serial
+        // console and turn RELAY_PIN1 on.
       } else if (idx == G1_POWEROFF_KYLE) {
-        Serial.println("Powering off...");
-        digitalWrite(RELAY_PIN1, LOW);
-        relayState = LOW;
+        // Print "Powering off" out to the serial
+        // console and turn RELAY_PIN1 off.
       }
       break;
     }
