@@ -46,11 +46,14 @@ enum Group0
 
 enum Group1 
 {
-  G1_SAYHI = 0,
-  G1_TURNON = 1,
-  G1_TURNOFF = 2,
-  G1_TURNON_KYLE = 6,
-  G1_POWEROFF_KYLE = 7,
+  G1_TURN_ON = 0,
+  G1_POWER_OFF = 1,
+  G1_SAY_HI = 2,
+  G1_TURN_ON_ANUJ = 3,
+  G1_POWER_OFF_ANUJ = 4,
+  G1_SAY_HI_ANUJ = 5,
+  G1_TURN_ON_KYLE = 6,
+  G1_POWER_OFF_KYLE = 7,
   G1_SAYHI_KYLE = 8,
 };
 
@@ -177,7 +180,7 @@ void loop()
     }
   }
 
-  // Update and send bluetooth status
+  sendBlutoothValues(); // Update and send bluetooth status
   // TODO: HINT there's a function written
   //       below that will do this for you!
 }
@@ -201,20 +204,50 @@ void action()
       break;
 
     case GROUP_1:
-      if (idx == G1_SAYHI_KYLE) {
-        // Say hi on the serial console
-        // and blink LED_PIN1 once.
-      } else if (idx == G1_TURNON_KYLE) {
-        // Print "Turning on..." out to the serial
-        // console and turn RELAY_PIN1 on.
-      } else if (idx == G1_POWEROFF_KYLE) {
-        // Print "Powering off" out to the serial
-        // console and turn RELAY_PIN1 off.
-      }
+      digitalWrite(RELAY_PIN1,LOW);
+      if (idx == G1_SAY_HI) {
+       Serial.println("Hi Abdulrahim");// Say hi on the serial console
+       digitalWrite(RELAY_PIN1,HIGH);
+       delay(500);
+       digitalWrite(RELAY_PIN1,LOW);
+       delay(500);
+       digitalWrite(RELAY_PIN1,HIGH);
+       delay(500);
+       digitalWrite(RELAY_PIN1,LOW);
+       relayState = 0;
+       // and blink LED_PIN1 twice.
+      } else if (idx == G1_SAY_HI_ANUJ) {
+       Serial.println("Hi Anuj");// Say hi on the serial console
+       digitalWrite(RELAY_PIN1,HIGH);
+       delay(500);
+       digitalWrite(RELAY_PIN1,LOW);
+       delay(500);
+       digitalWrite(RELAY_PIN1,HIGH);
+       delay(500);
+       digitalWrite(RELAY_PIN1,LOW);
+       relayState = 0;
+      } else if (idx == G1_SAYHI_KYLE) {
+       Serial.println("Hi Kyle");// Say hi on the serial console
+       digitalWrite(RELAY_PIN1,HIGH);
+       delay(500);
+       digitalWrite(RELAY_PIN1,LOW);
+       delay(500);
+       digitalWrite(RELAY_PIN1,HIGH);
+       delay(500);
+       digitalWrite(RELAY_PIN1,LOW);
+       relayState = 0;
+      } else if (idx == G1_TURN_ON || idx == G1_TURN_ON_ANUJ || idx == G1_TURN_ON_KYLE) {
+       Serial.println("Turning on..."); // Print "Turning on..." out to the serial
+       digitalWrite(RELAY_PIN1,HIGH);// console and turn RELAY_PIN1 on.
+       relayState = 1; // tells relaystate it's on
+      } else if (idx == G1_POWER_OFF || idx == G1_POWER_OFF_ANUJ || idx == G1_POWER_OFF_KYLE) {
+       Serial.println("Powering off");// Print "Powering off" out to the serial
+       digitalWrite(RELAY_PIN1,LOW); // console and turn RELAY_PIN1 off.
+       relayState = 0; // tells relaystate it's off
       break;
     }
+  }
 }
-
 /**
  * Setup the bluetooth module.
  */
